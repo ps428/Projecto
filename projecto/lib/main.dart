@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projecto/constants.dart';
+import 'package:projecto/routes/LoginPage.dart';
+import 'package:projecto/routes/SignUpPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +17,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Home Page',
       theme: ThemeData(
-        brightness: Brightness.dark,
         primaryColor: militantVegan,
         secondaryHeaderColor: monteCarlo,
+        backgroundColor: Colors.transparent,
         hoverColor: japanBlush,
         fontFamily: 'Playfair',
         textTheme: const TextTheme(
@@ -36,15 +38,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -53,31 +46,87 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              height: 140.0,
-              width: 300.0,
-              decoration: const BoxDecoration(
-                  color: parchmentPaper,
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: Column(
-                children: const [
-                  CustomText("Login 1", 30, pineGreen),
-                  CustomText("Login 2", 30, bottleGreen)
-                ],
-              ),
-            )
-          ],
-        ),
+  void initState() {}
+
+  void goToLogIn() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const LogInPage(),
       ),
     );
+  }
+
+  void goToSignUp() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignUpPage(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [pineGreen, bottleGreen])),
+        child: Scaffold(
+          // By defaut, Scaffold background is white
+          // Set its value to transparent
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.black45,
+            title: const Align(
+                alignment: Alignment.centerLeft, child: Text('Home Page')),
+          ),
+
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: const BoxDecoration(
+                      color: militantVegan,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CustomTextPlayfair(
+                          "Projecto: Showcase your projects here!",
+                          26,
+                          Colors.white),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const CustomTextPlayfair("Welcome", 20, Colors.white),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StyledButtonPlayfair(
+                              text: "Sign Up",
+                              onPressed: goToSignUp,
+                              size: 22.0),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          StyledButtonPlayfair(
+                              text: "Log In", onPressed: goToLogIn, size: 22.0),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ));
   }
 }

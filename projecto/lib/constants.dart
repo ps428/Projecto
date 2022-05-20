@@ -16,8 +16,8 @@ const bottleGreen2 = Color(0xff006A4E);
 const stromboli = Color(0xff2E5E4E);
 const bottleGreen = Color(0xff072227);
 
-class CustomText extends StatelessWidget {
-  const CustomText(this.heading, this.size, this.color);
+class CustomTextPlayfair extends StatelessWidget {
+  const CustomTextPlayfair(this.heading, this.size, this.color);
   final double size;
   final Color color;
   final String heading;
@@ -29,6 +29,28 @@ class CustomText extends StatelessWidget {
           heading,
           style:
               TextStyle(fontSize: size, fontFamily: 'Playfair', color: color),
+        ),
+      );
+}
+
+class StyledButtonPlayfair extends StatelessWidget {
+  const StyledButtonPlayfair(
+      {required this.text, required this.onPressed, required this.size});
+  final String text;
+  final double size;
+  final void Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) => ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: monteCarlo, // background (button) color
+          onPrimary: bottleGreen, // foreground (text) color
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: TextStyle(
+              fontFamily: 'Playfair', color: bottleGreen, fontSize: size),
         ),
       );
 }
