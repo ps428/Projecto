@@ -1,0 +1,2 @@
+- [] Use maxLength for contact number and pincode
+- [] obscureText for OTP
