@@ -1,2 +1,2 @@
-- [] Use maxLength for contact number and pincode
-- [] obscureText for OTP
+- [X] Use maxLength for contact number and pincode
+- [x] obscureText for OTP
