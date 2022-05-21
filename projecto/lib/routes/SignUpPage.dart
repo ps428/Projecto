@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:projecto/FirebaseFunctions.dart';
 import 'package:projecto/constants.dart';
+import 'package:projecto/routes/LoginPage.dart';
 import 'package:projecto/routes/OTPVerify.dart';
 
+import '../FirebaseUserSide.dart';
 import '../validator.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -14,6 +17,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
+  final _passwordTextController = TextEditingController();
   final _emailTextController = TextEditingController();
   final _nameTextController = TextEditingController();
   final _MobileNumberTextController = TextEditingController();
@@ -26,16 +30,54 @@ class _SignUpPage extends State<SignUpPage> {
   final _OccupationTextController = TextEditingController();
   final _YearsOfExperienceTextController = TextEditingController();
 
+  bool _isDuplicateID = false;
   bool _isProcessing = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {}
 
-  void SubmitDetails() {
+  Future<void> SignUp() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isProcessing = true;
+        _isDuplicateID = false;
+      });
+    }
+
+    if (_formKey.currentState!.validate()) {
+      List l = await FireAuth.registerUsingEmailPassword(
+        name: _nameTextController.text,
+        email: _emailTextController.text,
+        password: _passwordTextController.text,
+        isDuplicateID: _isDuplicateID,
+      );
+
+      User? user = await l[0];
+      _isDuplicateID = l[1];
+
+      setState(() {
+        _isProcessing = false;
+      });
+
+      if (user != null && _isDuplicateID == false) {
+        FirebaseUser.addUser(user.uid, _nameTextController.text,
+            _MobileNumberTextController.text, _emailTextController.text);
+      }
+
+      if (_isDuplicateID == false) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) =>
+                // HomeScreen()
+                const LogInPage(),
+            // builder: (context) =>
+            //     const SignupScreen(),
+          ),
+        );
+      } else {}
+      setState(() {
+        _isProcessing = false;
       });
     }
   }
@@ -234,6 +276,55 @@ class _SignUpPage extends State<SignUpPage> {
                                     ),
                                   ),
 
+                                  //Password field
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: TextFormField(
+                                      //controlling options and validation
+                                      //changes here for all objects
+                                      obscureText: true,
+                                      controller: _passwordTextController,
+                                      validator: (value) =>
+                                          Validator.validatePassword(
+                                        password: value,
+                                      ),
+
+                                      //decorations and UI enhancements
+                                      cursorColor: Colors.white,
+                                      decoration: InputDecoration(
+                                        //for floating name color
+                                        floatingLabelStyle: const TextStyle(
+                                            color: Colors.white),
+                                        labelText: "Password",
+                                        prefixIconColor: Colors.white,
+                                        fillColor: Colors.white,
+
+                                        errorBorder: UnderlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6.0),
+                                          borderSide: const BorderSide(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+
+                                        focusColor: Colors.white,
+
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                              color: Colors.white, width: 2.0),
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                        ),
+                                      ),
+
+                                      style: const TextStyle(
+                                          fontFamily: "Playfair",
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          decorationColor: Colors.white),
+                                    ),
+                                  ),
+
                                   const SizedBox(
                                     height: 7,
                                   ),
@@ -241,9 +332,7 @@ class _SignUpPage extends State<SignUpPage> {
                               ),
                             ),
                             StyledButtonPlayfair(
-                                onPressed: SubmitDetails,
-                                size: 20,
-                                text: "Submit")
+                                onPressed: SignUp, size: 20, text: "Submit")
                           ],
                         ),
                       )

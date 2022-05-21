@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:projecto/FirebaseFunctions.dart';
 import 'package:projecto/constants.dart';
 import 'package:projecto/routes/OTPVerify.dart';
 
@@ -14,11 +15,14 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPage extends State<LogInPage> {
-  final _MobileNumberTextController = TextEditingController();
+  final _emailTextController = TextEditingController();
+  final _passwordTextController = TextEditingController();
 
+  bool _optSent = false;
   final _OTPTextController = TextEditingController();
 
   bool _isProcessing = false;
+  bool _wrongUserCredentials = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -26,11 +30,28 @@ class _LogInPage extends State<LogInPage> {
 
   void sendOTP() {}
 
-  void LogInWithOTP() {
+  void LogInWithOTP(
+    String email,
+    String password,
+  ) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isProcessing = true;
       });
+
+      User? user = await FireAuth.signInUsingEmailPassword(
+          email: email, password: password);
+      if (user != null) {
+        setState(() {
+          _isProcessing = false;
+          _wrongUserCredentials = false;
+          _optSent = true;
+        });
+      } else {
+        setState(() {
+          _wrongUserCredentials = true;
+        });
+      }
     }
   }
 
@@ -84,15 +105,15 @@ class _LogInPage extends State<LogInPage> {
                               key: _formKey,
                               child: Column(
                                 children: <Widget>[
-                                  // mobile number field
+                                  // email field
                                   Container(
                                     padding: const EdgeInsets.all(10),
                                     child: TextFormField(
                                       //controlling options and validation
-                                      controller: _MobileNumberTextController,
+                                      controller: _emailTextController,
                                       validator: (value) =>
-                                          Validator.validatePhoneNumber(
-                                        phone: value,
+                                          Validator.validateEmail(
+                                        email: value,
                                       ),
 
                                       //decorations and UI enhancements
@@ -101,7 +122,55 @@ class _LogInPage extends State<LogInPage> {
                                         //for floating name color
                                         floatingLabelStyle: const TextStyle(
                                             color: Colors.white),
-                                        labelText: "Mobile Number",
+                                        labelText: "Email ID",
+                                        prefixIconColor: Colors.white,
+                                        fillColor: Colors.white,
+
+                                        errorBorder: UnderlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6.0),
+                                          borderSide: const BorderSide(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+
+                                        focusColor: Colors.white,
+
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                              color: Colors.white, width: 2.0),
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                        ),
+                                      ),
+
+                                      style: const TextStyle(
+                                          fontFamily: "Playfair",
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          decorationColor: Colors.white),
+                                    ),
+                                  ),
+
+                                  //password field
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: TextFormField(
+                                      //controlling options and validation
+                                      obscureText: true,
+                                      controller: _passwordTextController,
+                                      validator: (value) =>
+                                          Validator.validatePassword(
+                                        password: value,
+                                      ),
+
+                                      //decorations and UI enhancements
+                                      cursorColor: Colors.white,
+                                      decoration: InputDecoration(
+                                        //for floating name color
+                                        floatingLabelStyle: const TextStyle(
+                                            color: Colors.white),
+                                        labelText: "Password",
                                         prefixIconColor: Colors.white,
                                         fillColor: Colors.white,
 
@@ -132,48 +201,54 @@ class _LogInPage extends State<LogInPage> {
                                   ),
 
                                   // OTP field
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: TextFormField(
-                                      obscureText: true,
-                                      //controlling options and validation
-                                      controller: _OTPTextController,
+                                  _optSent
+                                      ? Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            obscureText: true,
+                                            //controlling options and validation
+                                            controller: _OTPTextController,
 
-                                      //decorations and UI enhancements
-                                      cursorColor: Colors.white,
-                                      decoration: InputDecoration(
-                                        //for floating name color
-                                        floatingLabelStyle: const TextStyle(
-                                            color: Colors.white),
-                                        labelText: "OTP",
-                                        prefixIconColor: Colors.white,
-                                        fillColor: Colors.white,
+                                            //decorations and UI enhancements
+                                            cursorColor: Colors.white,
+                                            decoration: InputDecoration(
+                                              //for floating name color
+                                              floatingLabelStyle:
+                                                  const TextStyle(
+                                                      color: Colors.white),
+                                              labelText: "OTP",
+                                              prefixIconColor: Colors.white,
+                                              fillColor: Colors.white,
 
-                                        errorBorder: UnderlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(6.0),
-                                          borderSide: const BorderSide(
-                                            color: Colors.red,
+                                              errorBorder: UnderlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6.0),
+                                                borderSide: const BorderSide(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+
+                                              focusColor: Colors.white,
+
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: const BorderSide(
+                                                    color: Colors.white,
+                                                    width: 2.0),
+                                                borderRadius:
+                                                    BorderRadius.circular(25.0),
+                                              ),
+                                            ),
+
+                                            style: const TextStyle(
+                                                fontFamily: "Playfair",
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                                decorationColor: Colors.white),
                                           ),
+                                        )
+                                      : const SizedBox(
+                                          height: 10,
                                         ),
-
-                                        focusColor: Colors.white,
-
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.white, width: 2.0),
-                                          borderRadius:
-                                              BorderRadius.circular(25.0),
-                                        ),
-                                      ),
-
-                                      style: const TextStyle(
-                                          fontFamily: "Playfair",
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                          decorationColor: Colors.white),
-                                    ),
-                                  ),
 
                                   const SizedBox(
                                     height: 7,
@@ -182,21 +257,22 @@ class _LogInPage extends State<LogInPage> {
                               ),
                             ),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                StyledButtonPlayfair(
-                                    text: "Send OTP",
-                                    onPressed: sendOTP,
-                                    size: 20),
-                                const SizedBox(width: 20),
-                                StyledButtonPlayfair(
-                                    onPressed: LogInWithOTP,
-                                    size: 20,
-                                    text: "Login")
-                              ],
-                            ),
+                            _wrongUserCredentials
+                                ? const CustomTextPlayfair(
+                                    "Error! Wrong Credentials!",
+                                    24,
+                                    Colors.white)
+                                : const SizedBox(
+                                    height: 2,
+                                  ),
+
+                            StyledButtonPlayfair(
+                                size: 20,
+                                text: "Log In",
+                                onPressed: () {
+                                  LogInWithOTP(_emailTextController.text,
+                                      _passwordTextController.text);
+                                })
                           ],
                         ),
                       )
