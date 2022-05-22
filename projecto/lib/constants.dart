@@ -33,6 +33,38 @@ class CustomTextPlayfair extends StatelessWidget {
       );
 }
 
+class CustomTextPlayfairUser extends StatelessWidget {
+  const CustomTextPlayfairUser(this.question, this.answer, this.size,
+      this.size2, this.color, this.color2);
+  final double size;
+  final double size2;
+  final Color color;
+  final Color color2;
+  final String? answer;
+  final String question;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Text(
+            question,
+            style: TextStyle(
+                fontSize: size2, fontFamily: 'Playfair', color: color2),
+          ),
+          SizedBox(
+            width: size / 2,
+          ),
+          Text(
+            answer!,
+            style:
+                TextStyle(fontSize: size, fontFamily: 'Playfair', color: color),
+          ),
+        ],
+      ));
+}
+
 class StyledButtonPlayfair extends StatelessWidget {
   const StyledButtonPlayfair(
       {required this.text, required this.onPressed, required this.size});
@@ -53,4 +85,56 @@ class StyledButtonPlayfair extends StatelessWidget {
               fontFamily: 'Playfair', color: bottleGreen, fontSize: size),
         ),
       );
+}
+
+class ProjectDataWidget extends StatelessWidget {
+  const ProjectDataWidget(this.title, this.description, this.category,
+      this.startDate, this.endDate);
+  final String title;
+  final String description;
+  final String category;
+  final String startDate;
+  final String endDate;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 22, fontFamily: 'Playfair', color: Colors.white),
+          ),
+          Text(
+            category,
+            style: const TextStyle(
+                fontSize: 18, fontFamily: 'Playfair', color: Colors.white60),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                startDate,
+                style: const TextStyle(
+                    fontSize: 16, fontFamily: 'Playfair', color: Colors.white),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Text(
+                endDate,
+                style: const TextStyle(
+                    fontSize: 16, fontFamily: 'Playfair', color: Colors.white),
+              ),
+            ],
+          ),
+          Text(
+            description,
+            style: const TextStyle(
+                fontSize: 14, fontFamily: 'Playfair', color: Colors.white54),
+          ),
+        ],
+      ));
 }

@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:projecto/FirebaseFunctions.dart';
+import 'package:projecto/FirebaseUserSide.dart';
 import 'package:projecto/constants.dart';
+import 'package:projecto/routes/HomePage.dart';
 import 'package:projecto/routes/OTPVerify.dart';
 
 import '../validator.dart';
@@ -17,9 +20,13 @@ class LogInPage extends StatefulWidget {
 class _LogInPage extends State<LogInPage> {
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
-
+  late final String phoneNumber;
+  late final User user;
   bool _optSent = false;
   final _OTPTextController = TextEditingController();
+  String OTPCODE = "";
+  bool _wrongOTP = false;
+  bool _wrongNumber = false;
 
   bool _isProcessing = false;
   bool _wrongUserCredentials = false;
@@ -39,19 +46,95 @@ class _LogInPage extends State<LogInPage> {
         _isProcessing = true;
       });
 
-      User? user = await FireAuth.signInUsingEmailPassword(
-          email: email, password: password);
+      user = (await FireAuth.signInUsingEmailPassword(
+          email: email, password: password))!;
       if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .get()
+            .then((value) => {
+                  value.docs.forEach((element) {
+                    if (element.data()["uID"] == user.uid) {
+                      phoneNumber = element.data()['phone'];
+                    }
+                  })
+                });
+        print(phoneNumber);
+
+        // FirebaseAuth auth = FirebaseAuth.instance;
+        // await FirebaseAuth.instance.verifyPhoneNumber(
+        //   phoneNumber: '+91' + phoneNumber,
+        //   verificationCompleted: (PhoneAuthCredential credential) async {
+        //     await auth.signInWithCredential(credential);
+        //   },
+        //   verificationFailed: (FirebaseAuthException e) {
+        //     if (e.code == 'invalid-phone-number') {
+        //       print('The provided phone number is not valid.');
+        //       setState(() {
+        //         _wrongNumber = true;
+        //       });
+        //     }
+        //   },
+        //   codeSent: (String verificationId, int? resendToken) async {
+        //     // Update the UI - wait for the user to enter the SMS code
+
+        //     // Create a PhoneAuthCredential with the code
+        //     setState(() {
+        //       OTPCODE = verificationId;
+        //       _optSent = true;
+        //     });
+        //     //TODO call a function here
+        //   },
+        //   codeAutoRetrievalTimeout: (String verificationId) {},
+        // );
+
+        // // FirebaseUser.sendOTP(phoneNumber);
+
         setState(() {
           _isProcessing = false;
           _wrongUserCredentials = false;
-          _optSent = true;
+          // _optSent = true;
         });
+
+        await Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) =>
+                // HomeScreen()
+                HomePage(
+              user: user,
+            ),
+          ),
+        );
+        // builder: (context) =>
+        //     //     const SignupScreen(),
+        //   ),
+        // );
+
       } else {
         setState(() {
           _wrongUserCredentials = true;
         });
       }
+    }
+  }
+
+  Future<void> verifyOTP() async {
+    if (OTPCODE == _OTPTextController.text) {
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) =>
+              // HomeScreen()
+              HomePage(
+            user: user,
+          ),
+          // builder: (context) =>
+          //     const SignupScreen(),
+        ),
+      );
+    } else {
+      setState(() {
+        _wrongOTP = true;
+      });
     }
   }
 
@@ -202,53 +285,72 @@ class _LogInPage extends State<LogInPage> {
 
                                   // OTP field
                                   _optSent
-                                      ? Container(
-                                          padding: const EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            obscureText: true,
-                                            //controlling options and validation
-                                            controller: _OTPTextController,
+                                      ? Column(children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              obscureText: true,
+                                              //controlling options and validation
+                                              controller: _OTPTextController,
 
-                                            //decorations and UI enhancements
-                                            cursorColor: Colors.white,
-                                            decoration: InputDecoration(
-                                              //for floating name color
-                                              floatingLabelStyle:
-                                                  const TextStyle(
-                                                      color: Colors.white),
-                                              labelText: "OTP",
-                                              prefixIconColor: Colors.white,
-                                              fillColor: Colors.white,
+                                              //decorations and UI enhancements
+                                              cursorColor: Colors.white,
+                                              decoration: InputDecoration(
+                                                //for floating name color
+                                                floatingLabelStyle:
+                                                    const TextStyle(
+                                                        color: Colors.white),
+                                                labelText: "OTP",
+                                                prefixIconColor: Colors.white,
+                                                fillColor: Colors.white,
 
-                                              errorBorder: UnderlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0),
-                                                borderSide: const BorderSide(
-                                                  color: Colors.red,
+                                                errorBorder:
+                                                    UnderlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6.0),
+                                                  borderSide: const BorderSide(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+
+                                                focusColor: Colors.white,
+
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: const BorderSide(
+                                                      color: Colors.white,
+                                                      width: 2.0),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          25.0),
                                                 ),
                                               ),
 
-                                              focusColor: Colors.white,
-
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.white,
-                                                    width: 2.0),
-                                                borderRadius:
-                                                    BorderRadius.circular(25.0),
-                                              ),
+                                              style: const TextStyle(
+                                                  fontFamily: "Playfair",
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                  decorationColor:
+                                                      Colors.white),
                                             ),
-
-                                            style: const TextStyle(
-                                                fontFamily: "Playfair",
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                                decorationColor: Colors.white),
                                           ),
-                                        )
-                                      : const SizedBox(
-                                          height: 10,
-                                        ),
+                                          StyledButtonPlayfair(
+                                              text: "Verify OTP",
+                                              onPressed: verifyOTP,
+                                              size: 20)
+                                        ])
+                                      : StyledButtonPlayfair(
+                                          size: 20,
+                                          text: "Log In",
+                                          onPressed: () {
+                                            LogInWithOTP(
+                                                _emailTextController.text,
+                                                _passwordTextController.text);
+                                          }),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
 
                                   const SizedBox(
                                     height: 7,
@@ -256,7 +358,12 @@ class _LogInPage extends State<LogInPage> {
                                 ],
                               ),
                             ),
-
+                            _wrongOTP
+                                ? const CustomTextPlayfair(
+                                    "Error! Wrong OTP!", 24, Colors.white)
+                                : const SizedBox(
+                                    height: 2,
+                                  ),
                             _wrongUserCredentials
                                 ? const CustomTextPlayfair(
                                     "Error! Wrong Credentials!",
@@ -265,14 +372,6 @@ class _LogInPage extends State<LogInPage> {
                                 : const SizedBox(
                                     height: 2,
                                   ),
-
-                            StyledButtonPlayfair(
-                                size: 20,
-                                text: "Log In",
-                                onPressed: () {
-                                  LogInWithOTP(_emailTextController.text,
-                                      _passwordTextController.text);
-                                })
                           ],
                         ),
                       )

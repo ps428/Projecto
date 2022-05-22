@@ -50,6 +50,7 @@ class _SignUpPage extends State<SignUpPage> {
         name: _nameTextController.text,
         email: _emailTextController.text,
         password: _passwordTextController.text,
+        phoneNumber: _MobileNumberTextController.text,
         isDuplicateID: _isDuplicateID,
       );
 
@@ -106,7 +107,7 @@ class _SignUpPage extends State<SignUpPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.3,
+                        height: MediaQuery.of(context).size.height * 0.2,
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width * 0.8,
@@ -324,6 +325,12 @@ class _SignUpPage extends State<SignUpPage> {
                                           decorationColor: Colors.white),
                                     ),
                                   ),
+                                  _isDuplicateID
+                                      ? const CustomTextPlayfair(
+                                          "Error! Id already taken",
+                                          20,
+                                          Colors.white)
+                                      : const SizedBox(height: 2),
 
                                   const SizedBox(
                                     height: 7,

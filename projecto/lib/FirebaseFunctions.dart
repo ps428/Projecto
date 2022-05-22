@@ -6,6 +6,7 @@ class FireAuth {
       {required String name,
       required String email,
       required String password,
+      required String phoneNumber,
       required bool isDuplicateID}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
@@ -18,6 +19,8 @@ class FireAuth {
 
       user = await userCredential.user;
       await user!.updateDisplayName(name);
+      // PhoneAuthCredential phone = ("+91" + phoneNumber) as PhoneAuthCredential;
+      // await user.updatePhoneNumber(phone);
       await user.reload();
       user = auth.currentUser;
     } on FirebaseAuthException catch (e) {

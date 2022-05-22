@@ -91,7 +91,11 @@ class _MyHomePageState extends State<MyHomePage> {
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   padding: const EdgeInsets.all(10.0),
