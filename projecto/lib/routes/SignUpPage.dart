@@ -67,6 +67,9 @@ class _SignUpPage extends State<SignUpPage> {
       }
 
       if (_isDuplicateID == false) {
+        PhoneAuthCredential phone =
+            "+91" + _MobileNumberTextController.text as PhoneAuthCredential;
+        user!.updatePhoneNumber(phone);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) =>

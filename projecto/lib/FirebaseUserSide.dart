@@ -27,13 +27,13 @@ class FirebaseUser {
 
     projects
         .doc(uID)
-        .set({})
-        .then((value) => print("project db created"))
+        .set({'zzz': '1'})
+        .then((value) => print("Project DB Added"))
         .catchError((error) => print("Failed to add user: $error"));
 
     profiles
         .doc(uID)
-        .set({})
+        .set({'zzz': '1'})
         .then((value) => print("profile db created"))
         .catchError((error) => print("Failed to add user: $error"));
   }
@@ -68,6 +68,10 @@ class FirebaseUser {
 
     var data =
         await FirebaseFirestore.instance.collection('projects').doc(uID).get();
+    print(data.data());
+    if (data.data() == null) {
+      return [];
+    }
     var mappedData = await data.data();
     if (mappedData!.isEmpty) {
       return tmpReturnList;
@@ -125,8 +129,9 @@ class FirebaseUser {
     // };
     var data2 =
         await FirebaseFirestore.instance.collection('profiles').doc(uID).get();
+    print(data2.data());
     var mappedData = await data2.data();
-    mappedData?.forEach((key, value) {
+    mappedData!.forEach((key, value) {
       returnData[key] = value;
     });
     print(mappedData);
