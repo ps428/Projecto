@@ -20,8 +20,8 @@ class LogInPage extends StatefulWidget {
 class _LogInPage extends State<LogInPage> {
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
-  late final String phoneNumber;
-  late final User user;
+  late String phoneNumber;
+  late User user;
   bool _optSent = false;
   final _OTPTextController = TextEditingController();
   String OTPCODE = "";
